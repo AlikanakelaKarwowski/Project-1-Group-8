@@ -5,6 +5,8 @@ import pandas as pd
 with open('genome.txt', 'r') as file:
     genome = file.read()
 
+genome = genome.upper()
+
 genome = pd.DataFrame(list(reader(genome)))
 
 conditions = [genome[0] == 'A', genome[0] == 'T', genome[0] == 'G', genome[0] == 'C']
