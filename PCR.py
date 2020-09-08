@@ -1,18 +1,19 @@
-from csv import reader
-import numpy as np
-import pandas as pd
-
 with open('genome.txt', 'r') as file:
     genome = file.read()
 
-genome = genome.upper()
+cDNA = genome.upper()
 
-genome = pd.DataFrame(list(reader(genome)))
+cDNA = cDNA.replace("A", "X")
+cDNA = cDNA.replace("T", "A")
+cDNA = cDNA.replace("X", "T")
+cDNA = cDNA.replace("C", "X")
+cDNA = cDNA.replace("G", "C")
+cDNA = cDNA.replace("X", "G")
 
-conditions = [genome[0] == 'A', genome[0] == 'T', genome[0] == 'G', genome[0] == 'C']
+#Blast primer #4
+#("Sequence, Starting Point, Ending point, GC Content")
+fPrimer = ("GGTTTTGTCGTGCCTGGTTT", 298, 317, .5)
+rPrimer = ("AGCAGCCAAAACACAAGCTG", 462, 443, .5) #Sequence is reversed 
 
-choices = ['T', 'A', 'C', 'G']
-
-genome[1] = np.select(conditions, choices)
-
-print(genome.head())
+print(genome[fPrimer[1]:rPrimer[1]])
+print(cDNA[fPrimer[1]:rPrimer[1]])
