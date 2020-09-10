@@ -1,3 +1,24 @@
+def find_compliment(genome):
+    """
+    Find the compliment to submitted RNA genome
+    :param dna: String of RNA
+    :return: Tuple of original string and complement
+    """
+    cDNA = genome.upper()
+
+    # Replace the nucleotides for the complementary DNA strand
+    cDNA = cDNA.replace("A", "X")
+    cDNA = cDNA.replace("T", "A")
+    cDNA = cDNA.replace("X", "T")
+    cDNA = cDNA.replace("C", "X")
+    cDNA = cDNA.replace("G", "C")
+    cDNA = cDNA.replace("X", "G")
+
+    # Create DNA Object
+    DNA = (genome, cDNA)
+    return DNA
+
+
 def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
     """
     This function will run a simulation of PCR using the submitted DNA segment and primers.
@@ -45,18 +66,8 @@ if __name__ == '__main__':
 
     # Make the string all uppercase for ease of use
     genome = genome.upper()
-    cDNA = genome.upper()
 
-    # Replace the nucleotides for the complementary DNA strand
-    cDNA = cDNA.replace("A", "X")
-    cDNA = cDNA.replace("T", "A")
-    cDNA = cDNA.replace("X", "T")
-    cDNA = cDNA.replace("C", "X")
-    cDNA = cDNA.replace("G", "C")
-    cDNA = cDNA.replace("X", "G")
-
-    # Create DNA Object
-    DNA = (genome, cDNA)
+    DNA = find_compliment(genome)
 
     # Blast primer #4
     # ("Sequence, Starting Point, Ending point, GC Content")
