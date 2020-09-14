@@ -50,22 +50,30 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
             strand_to_add = ''
             if forward_sequence[1:] in strand:
                 # TODO: Loop through strand backwards, checking and adding opposite bases
-                strand_to_add = reverse_sequence[:]
-                # start at the back -> front
-                for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]:
-                    print("strand to add", strand_to_add)
-                    print("strand copied", strand)
-                    if base == "A":
-                        strand_to_add = strand_to_add + "T"
-                    if base == "T":
-                        strand_to_add = strand_to_add + "A"
-                    if base == "G":
-                        strand_to_add = strand_to_add + "C"
-                    if base == "C":
-                        strand_to_add = strand_to_add + "G"
 
-                print("New strand", strand_to_add)
-                print("old strand", strand)
+                strand_to_add = reverse_sequence[:]
+                reverse_strand = strand[::-1]
+                reverse_strand_to_add = strand_to_add[::-1]
+                # start at the back -> front
+                #for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]:
+                for base in reverse_strand[len(reverse_sequence):]:
+                    if base == "A":
+                        reverse_strand_to_add = reverse_strand_to_add + "T"
+                    if base == "T":
+                        reverse_strand_to_add = reverse_strand_to_add + "A"
+                    if base == "G":
+                        reverse_strand_to_add = reverse_strand_to_add + "C"
+                    if base == "C":
+                        reverse_strand_to_add = reverse_strand_to_add + "G"
+
+                # reverse string again for correct 5'-3' order
+                strand_to_add = reverse_strand_to_add[::-1]
+
+                # add to new strand to DNA pool
+                replicated_dna.append(strand_to_add)
+
+                print("New strand: ", strand_to_add)
+                print("Org strand: ", strand)
                         
             elif reverse_sequence in strand:
                 # TODO: Loop through strand forwards, checking and adding opposite bases
