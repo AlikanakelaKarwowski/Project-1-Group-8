@@ -73,9 +73,6 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
                 replicated_dna.append(strand_to_add)
                         
             elif reverse_sequence in strand:
-                print("rev seq", reverse_sequence)
-                print("for seq", strand)
-                print("for seq", forward_sequence[1:])
                 # TODO: Loop through strand forwards, checking and adding opposite bases
 
                 strand_to_add = forward_sequence[1:]
