@@ -48,14 +48,55 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
         dna_copied = []
         for i, strand in zip(range(0, (len(replicated_dna) + 1)), replicated_dna):
             strand_to_add = ''
-            if forward_sequence in strand:
+            if forward_sequence[1:] in strand:
                 # TODO: Loop through strand backwards, checking and adding opposite bases
-                strand_to_add = reverse_sequence
+                # start at the back -> front
+                # reverse strings to iterate through lists forwards for my mental health
+                strand_to_add = reverse_sequence[::-1]
+                reverse_strand = strand[::-1]
+                
+                #for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]: (this loops through it backwards)
+                for base in reverse_strand[len(reverse_sequence):]:
+                    if base == "A":
+                        strand_to_add = strand_to_add[:] + "T"
+                    if base == "T":
+                        strand_to_add = strand_to_add[:] + "A"
+                    if base == "G":
+                        strand_to_add = strand_to_add[:] + "C"
+                    if base == "C":
+                        strand_to_add = strand_to_add[:] + "G"
 
+                # reverse string again for correct 5'-3' order
+                strand_to_add = strand_to_add[::-1]
+
+                # add to new strand to DNA pool
+                replicated_dna.append(strand_to_add)
+                        
             elif reverse_sequence in strand:
                 # TODO: Loop through strand forwards, checking and adding opposite bases
+
+                strand_to_add = forward_sequence[1:]
+
+                #for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]: (this loops through it backwards)
+                for base in strand[len(forward_sequence[1:]):]:
+                    if base == "A":
+                        strand_to_add = strand_to_add + "T"
+                    if base == "T":
+                        strand_to_add = strand_to_add + "A"
+                    if base == "G":
+                        strand_to_add = strand_to_add + "C"
+                    if base == "C":
+                        strand_to_add = strand_to_add + "G"
+
+                # add to new strand to DNA pool
+                replicated_dna.append(strand_to_add)
+
             else:
                 print('Neither primer was found in the strand. Something went wrong')
+
+        print("DNA after PCR")
+        for rna in replicated_dna:
+            print(rna)
 
     return replicated_dna
 
@@ -78,6 +119,7 @@ if __name__ == '__main__':
     print(DNA[0][fPrimer[1]:rPrimer[1]])
     print(DNA[1][fPrimer[1]:rPrimer[1]])
 
+    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=1)
     '''
     #replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=1)
 
