@@ -52,50 +52,44 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
                 # TODO: Loop through strand backwards, checking and adding opposite bases
 
                 # (reverse strings to go iterate through lists forwards for my mental health)
-                strand_to_add = reverse_sequence[:]
+                strand_to_add = reverse_sequence[::-1]
                 reverse_strand = strand[::-1]
-                reverse_strand_to_add = strand_to_add[::-1]
                 # start at the back -> front
                 #for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]: (this loops through it backwards)
                 for base in reverse_strand[len(reverse_sequence):]:
                     if base == "A":
-                        reverse_strand_to_add = reverse_strand_to_add + "T"
+                        strand_to_add = strand_to_add[:] + "T"
                     if base == "T":
-                        reverse_strand_to_add = reverse_strand_to_add + "A"
+                        strand_to_add = strand_to_add[:] + "A"
                     if base == "G":
-                        reverse_strand_to_add = reverse_strand_to_add + "C"
+                        strand_to_add = strand_to_add[:] + "C"
                     if base == "C":
-                        reverse_strand_to_add = reverse_strand_to_add + "G"
+                        strand_to_add = strand_to_add[:] + "G"
 
                 # reverse string again for correct 5'-3' order
-                strand_to_add = reverse_strand_to_add[::-1]
+                strand_to_add = strand_to_add[::-1]
 
                 # add to new strand to DNA pool
                 replicated_dna.append(strand_to_add)
-
-                print("New strand: ", strand_to_add)
-                print("Org strand: ", strand)
                         
             elif reverse_sequence in strand:
+                print("rev seq", reverse_sequence)
+                print("for seq", strand)
+                print("for seq", forward_sequence[1:])
                 # TODO: Loop through strand forwards, checking and adding opposite bases
 
                 strand_to_add = forward_sequence[1:]
-                reverse_strand = strand[::-1]
-                reverse_strand_to_add = strand_to_add[::-1]
 
                 #for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]: (this loops through it backwards)
-                for base in reverse_strand[len(forward_sequence[1:]):]:
+                for base in strand[len(forward_sequence[1:]):]:
                     if base == "A":
-                        reverse_strand_to_add = reverse_strand_to_add + "T"
+                        strand_to_add = strand_to_add + "T"
                     if base == "T":
-                        reverse_strand_to_add = reverse_strand_to_add + "A"
+                        strand_to_add = strand_to_add + "A"
                     if base == "G":
-                        reverse_strand_to_add = reverse_strand_to_add + "C"
+                        strand_to_add = strand_to_add + "C"
                     if base == "C":
-                        reverse_strand_to_add = reverse_strand_to_add + "G"
-
-                # reverse string again for correct 5'-3' order
-                strand_to_add = reverse_strand_to_add[::-1]
+                        strand_to_add = strand_to_add + "G"
 
                 # add to new strand to DNA pool
                 replicated_dna.append(strand_to_add)
@@ -103,10 +97,10 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
             else:
                 print('Neither primer was found in the strand. Something went wrong')
 
-        print(replicated_dna[0])
-        print(replicated_dna[1])
-        print(replicated_dna[2])
-        print(replicated_dna[3])
+        print("DNA after PCR")
+        for rna in replicated_dna:
+            print(rna)
+
     return replicated_dna
 
 if __name__ == '__main__':
