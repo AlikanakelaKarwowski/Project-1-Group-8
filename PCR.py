@@ -50,14 +50,26 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
             strand_to_add = ''
             if forward_sequence[1:] in strand:
                 # TODO: Loop through strand backwards, checking and adding opposite bases
-                strand_to_add = reverse_sequence
-                print('Strand to add', strand_to_add)
+                strand_to_add = reverse_sequence[:]
                 # start at the back -> front
-    
+                for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]:
+                    print("strand to add", strand_to_add)
+                    print("strand copied", strand)
+                    if base == "A":
+                        strand_to_add = strand_to_add + "T"
+                    if base == "T":
+                        strand_to_add = strand_to_add + "A"
+                    if base == "G":
+                        strand_to_add = strand_to_add + "C"
+                    if base == "C":
+                        strand_to_add = strand_to_add + "G"
+
+                print("New strand", strand_to_add)
+                print("old strand", strand)
+                        
             elif reverse_sequence in strand:
                 # TODO: Loop through strand forwards, checking and adding opposite bases
                 strand_to_add = forward_sequence
-                print('Strand to add', strand_to_add)
             else:
                 print('Neither primer was found in the strand. Something went wrong')
 
