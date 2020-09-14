@@ -51,7 +51,7 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
             if forward_sequence[1:] in strand:
                 # TODO: Loop through strand backwards, checking and adding opposite bases
                 # start at the back -> front
-                # reverse strings to go iterate through lists forwards for my mental health
+                # reverse strings to iterate through lists forwards for my mental health
                 strand_to_add = reverse_sequence[::-1]
                 reverse_strand = strand[::-1]
                 
