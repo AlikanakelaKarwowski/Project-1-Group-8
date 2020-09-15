@@ -93,11 +93,11 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
 
             else:
                 print('Neither primer was found in the strand. Something went wrong')
-
+        '''
         print("DNA after PCR")
         for rna in replicated_dna:
             print(rna)
-
+        '''
     return replicated_dna
 
 if __name__ == '__main__':
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     print(DNA[0][fPrimer[1]:rPrimer[1]])
     print(DNA[1][fPrimer[1]:rPrimer[1]])
 
-    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=1)
+    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=20)
     '''
     #replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=1)
 
