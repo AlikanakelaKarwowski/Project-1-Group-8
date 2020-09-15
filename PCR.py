@@ -1,3 +1,5 @@
+import time
+
 def find_compliment(genome):
     """
     Find the compliment to submitted RNA genome
@@ -114,6 +116,7 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     # Read Contents of File
     with open('genome.txt', 'r') as file:
         genome = file.read()
@@ -132,4 +135,6 @@ if __name__ == '__main__':
     print(DNA[0][fPrimer[1]:rPrimer[1]])
     print(DNA[1][fPrimer[1]:rPrimer[1]])
 
-    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=10)
+    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=20)
+
+    print('PCR executed In: ', time.time() - start_time)
