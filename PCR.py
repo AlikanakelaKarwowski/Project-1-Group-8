@@ -1,12 +1,12 @@
 import time
 
-def find_compliment(genome):
+def find_compliment(RNA):
     """
-    Find the compliment to submitted RNA genome
-    :param genome: String of RNA
+    Find the compliment to submitted RNA RNA
+    :param RNA: String of RNA
     :return: Tuple of original string and complement
     """
-    cDNA = genome.upper()
+    cDNA = RNA.upper()
 
     # Replace the nucleotides for the complementary DNA strand
     cDNA = cDNA.replace("A", "X")
@@ -17,7 +17,7 @@ def find_compliment(genome):
     cDNA = cDNA.replace("X", "G")
 
     # Create DNA Object
-    DNA = (genome, cDNA)
+    DNA = (RNA, cDNA)
     return DNA
 
 
@@ -36,6 +36,7 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
     :return: list with each entry being half of a replicated DNA string. Next entry is the other half of the strand
     """
 
+    replaceDict = {"A": "T", "T": "A", "G": "C", "C": "G"}
     forward_sequence = forward_primer[0]
     forward_start = forward_primer[1]
     reverse_sequence = reverse_primer[0][::-1]
@@ -65,15 +66,7 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
 
                     # for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]: (this loops through it backwards)
                     for base in reverse_strand[len(reverse_sequence):]:
-                        if base == "A":
-                            strand_to_add = strand_to_add[:] + "T"
-                        if base == "T":
-                            strand_to_add = strand_to_add[:] + "A"
-                        if base == "G":
-                            strand_to_add = strand_to_add[:] + "C"
-                        if base == "C":
-                            strand_to_add = strand_to_add[:] + "G"
-
+                        strand_to_add = strand_to_add[:]+ replaceDict[base]
                     # reverse string again for correct 5'-3' order
                     strand_to_add = strand_to_add[::-1]
 
@@ -86,15 +79,8 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
 
                     # for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]: (this loops through it backwards)
                     for base in strand[len(forward_sequence[1:]):]:
-                        if base == "A":
-                            strand_to_add = strand_to_add + "T"
-                        if base == "T":
-                            strand_to_add = strand_to_add + "A"
-                        if base == "G":
-                            strand_to_add = strand_to_add + "C"
-                        if base == "C":
-                            strand_to_add = strand_to_add + "G"
-
+                        strand_to_add = strand_to_add + replaceDict[base]
+                        
                     # add to new strand to DNA pool
                     new_pair.append(strand_to_add)
 
@@ -105,7 +91,7 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
             dna_copied.append(new_pair)
 
         replicated_dna.extend(dna_copied)
-
+        print(f"Cycle: {cycle}")
         '''
         print("DNA after PCR")
         for rna in replicated_dna:
@@ -119,12 +105,12 @@ if __name__ == '__main__':
     start_time = time.time()
     # Read Contents of File
     with open('genome.txt', 'r') as file:
-        genome = file.read()
+        RNA = file.read()
 
     # Make the string all uppercase for ease of use
-    genome = genome.upper()
+    RNA = RNA.upper()
 
-    DNA = find_compliment(genome)
+    DNA = find_compliment(RNA)
 
     # Blast primer #4
     # ("Sequence, Starting Point, Ending point, GC Content")
@@ -132,9 +118,9 @@ if __name__ == '__main__':
     rPrimer = ("AGCAGCCAAAACACAAGCTG", 462, 443, .5)  # Sequence is reversed
 
     # Print Sequence to replicate
-    print(DNA[0][fPrimer[1]:rPrimer[1]])
-    print(DNA[1][fPrimer[1]:rPrimer[1]])
+    #print(DNA[0][fPrimer[1]:rPrimer[1]])
+    #print(DNA[1][fPrimer[1]:rPrimer[1]])
 
-    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=20)
-
+    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=25)
+    #print(replicated_DNA)
     print('PCR executed In: ', time.time() - start_time)
