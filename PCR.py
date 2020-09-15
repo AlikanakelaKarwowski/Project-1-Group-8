@@ -114,13 +114,13 @@ if __name__ == '__main__':
 
     # Blast primer #4
     # ("Sequence, Starting Point, Ending point, GC Content")
-    fPrimer = ("GGTTTTGTCGTGCCTGGTTT", 298, 317, .5)
-    rPrimer = ("AGCAGCCAAAACACAAGCTG", 462, 443, .5)  # Sequence is reversed
+    fPrimer = ("GGTTTTGTCGTGCCTGGTTT", 297, 317, .5)
+    rPrimer = ("AGCAGCCAAAACACAAGCTG", 464, 443, .5)  # Sequence is reversed
 
     # Print Sequence to replicate
-    #print(DNA[0][fPrimer[1]:rPrimer[1]])
-    #print(DNA[1][fPrimer[1]:rPrimer[1]])
+    print(DNA[0][fPrimer[1]:rPrimer[1]])
+    print(DNA[1][fPrimer[1]:rPrimer[1]])
 
-    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=25)
+    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=5)
     #print(replicated_DNA)
     print('PCR executed In: ', time.time() - start_time)
