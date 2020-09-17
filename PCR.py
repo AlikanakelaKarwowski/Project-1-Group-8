@@ -1,4 +1,5 @@
 import time
+import random
 
 def find_compliment(RNA):
     """
@@ -21,7 +22,7 @@ def find_compliment(RNA):
     return DNA
 
 
-def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
+def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=200):
     """
     This function will run a simulation of PCR using the submitted DNA segment and primers. First, input DNA will be
     will be shortened to only the section that will be replicated and saved to a tuple that is appended to an empty list.
@@ -33,40 +34,43 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
     :param forward_primer: Tuple for forward primer. Contains: sequence, starting point, ending point, GC content
     :param reverse_primer: Tuple for reverse primer. Contains: sequence, starting point, ending point, GC content
     :param cycles: Number of cycles to simulate. Defaults to 10.
+    :param fall_off_rate_base: The base falloff rate to be incremented using a random int between -50 and 50.
     :return: list with each entry being half of a replicated DNA string. Next entry is the other half of the strand
     """
 
     replaceDict = {"A": "T", "T": "A", "G": "C", "C": "G"}
     forward_sequence = forward_primer[0]
-    forward_start = forward_primer[1]
     reverse_sequence = reverse_primer[0][::-1]
-    reverse_start = reverse_primer[1]
-
-    # Shorten input DNA to focus only on the section we care about
-    shortened_dna = list()
-    shortened_dna.append(dna[0][forward_start:reverse_start])
-    shortened_dna.append(dna[1][forward_start:reverse_start])
 
     # Make copy of DNA to store the results of the PCR
     replicated_dna = list()
-    replicated_dna.append(tuple(shortened_dna))
+    replicated_dna.append(tuple(dna))
 
     # Replicate the section
     for cycle in range(1, (cycles + 1)):
         dna_copied = []  # All of the new DNA pairs that will be found in the cycle
         for strands in replicated_dna:
-            new_pair = list()  # New double strand of DNA (tuple)
+            new_pair = list()  # New double strand of DNA (convert to tuple at end of iteration)
             for strand in strands:  # For loop definition does the equivalent of denaturation
                 strand_to_add = ''
-                if forward_sequence[1:] in strand:
+                falloff_rate = fall_off_rate_base + random.randint(-50, 50)
+                #if forward_sequence[1:] in strand:
+                if forward_sequence in strand:
                     # start at the back -> front
                     # reverse strings to iterate through lists forwards for my mental health
                     strand_to_add = reverse_sequence[::-1]
                     reverse_strand = strand[::-1]
+                    primer_index = reverse_strand.find(reverse_sequence[::-1])
+                    start_index = primer_index + len(reverse_sequence)
 
-                    # for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]: (this loops through it backwards)
-                    for base in reverse_strand[len(reverse_sequence):]:
-                        strand_to_add = strand_to_add[:]+ replaceDict[base]
+                    if falloff_rate > len(reverse_strand[start_index:]):
+                        for base in reverse_strand[start_index:]:
+                            strand_to_add = strand_to_add[:] + replaceDict[base]
+                    else:
+                        end_index = start_index + falloff_rate
+                        for base in reverse_strand[start_index:end_index]:
+                            strand_to_add = strand_to_add[:] + replaceDict[base]
+
                     # reverse string again for correct 5'-3' order
                     strand_to_add = strand_to_add[::-1]
 
@@ -74,17 +78,23 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
                     new_pair.append(strand_to_add)
 
                 elif reverse_sequence in strand:
+                    primer_index = strand.find(reverse_sequence) # Increment by 20 to take
+                    start_index = primer_index + len(reverse_sequence)
+                    strand_to_add = forward_sequence
 
-                    strand_to_add = forward_sequence[1:]
+                    if falloff_rate > len(strand[start_index:]):
+                        for base in strand[start_index:]:
+                            strand_to_add = strand_to_add + replaceDict[base]
+                    else:
+                        end_index = start_index + falloff_rate
+                        for base in strand[start_index:end_index]:
+                            strand_to_add = strand_to_add + replaceDict[base]
 
-                    # for base in replicated_dna[0][-len(reverse_sequence) - 1::-1]: (this loops through it backwards)
-                    for base in strand[len(forward_sequence[1:]):]:
-                        strand_to_add = strand_to_add + replaceDict[base]
-                        
                     # add to new strand to DNA pool
                     new_pair.append(strand_to_add)
 
                 else:
+                    # TODO: Put in flagging mechanism
                     print('Neither primer was found in the strand. Something went wrong')
 
             new_pair = tuple(new_pair)
@@ -92,17 +102,18 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10):
 
         replicated_dna.extend(dna_copied)
         print(f"Cycle: {cycle}")
-        '''
+
         print("DNA after PCR")
         for rna in replicated_dna:
             print(rna)
-        '''
 
     return replicated_dna
 
 
 if __name__ == '__main__':
+    #random.seed(99)
     start_time = time.time()
+
     # Read Contents of File
     with open('genome.txt', 'r') as file:
         RNA = file.read()
@@ -118,9 +129,9 @@ if __name__ == '__main__':
     rPrimer = ("AGCAGCCAAAACACAAGCTG", 464, 443, .5)  # Sequence is reversed
 
     # Print Sequence to replicate
-    print(DNA[0][fPrimer[1]:rPrimer[1]])
-    print(DNA[1][fPrimer[1]:rPrimer[1]])
+    #print(DNA[0][fPrimer[1]:rPrimer[1]])
+    #print(DNA[1][fPrimer[1]:rPrimer[1]])
 
-    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=5)
-    #print(replicated_DNA)
-    print('PCR executed In: ', time.time() - start_time)
+    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=3, fall_off_rate_base=200)
+
+    print('PCR executed in: ', time.time() - start_time)
