@@ -2,6 +2,7 @@ import time
 import random
 import matplotlib.pyplot as plt
 
+
 def find_compliment(RNA):
     """
     Find the compliment to submitted RNA RNA
@@ -25,9 +26,8 @@ def find_compliment(RNA):
 
 def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=180):
     """
-    This function will run a simulation of PCR using the submitted DNA segment and primers. First, input DNA will be
-    will be shortened to only the section that will be replicated and saved to a tuple that is appended to an empty list.
-    Loop through the number of cycles. For each cycle, replicate each double stranded DNA tuple within the list.
+    This function will run a simulation of PCR using the submitted DNA segment and primers.  For each cycle, replicate
+    each double stranded DNA tuple within the list.
     Within each double stranded tuple, replicate each strand. Strand replication is done by finding which primer is the
     compliment to the input strand. The rest of the strand is then looped through, finding the rest of the base pairs.
     One large list of DNA tuples is then exported as a result.
@@ -42,6 +42,8 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=1
     replaceDict = {"A": "T", "T": "A", "G": "C", "C": "G"}
     forward_sequence = forward_primer[0]
     reverse_sequence = reverse_primer[0][::-1]
+    forward_compliment = find_compliment(forward_sequence)
+    reverse_compliment = find_compliment(reverse_sequence)
 
     # Make copy of DNA to store the results of the PCR
     replicated_dna = list()
@@ -55,18 +57,17 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=1
             for strand in strands:  # For loop definition does the equivalent of denaturation
                 strand_to_add = ''
                 falloff_rate = fall_off_rate_base + random.randint(-50, 50)
-                print(falloff_rate)
-                #if forward_sequence[1:] in strand:
-                if forward_sequence in strand:
+                if reverse_compliment[1] in strand:
                     # start at the back -> front
                     # reverse strings to iterate through lists forwards for my mental health
                     strand_to_add = reverse_sequence[::-1]
                     reverse_strand = strand[::-1]
+                    start_index = reverse_strand.find(reverse_compliment[1][::-1]) + len(reverse_sequence)
+                    end_index = start_index + falloff_rate
 
                     # copy up to the length of the falloff_rate
-                    for base in reverse_strand[len(reverse_sequence):]:
-                        if ((len(strand_to_add) - 20) <= falloff_rate):
-                            strand_to_add = strand_to_add[:] + replaceDict[base]
+                    for base in reverse_strand[start_index:end_index]:
+                        strand_to_add = strand_to_add[:] + replaceDict[base]
 
                     # reverse string again for correct 5'-3' order
                     strand_to_add = strand_to_add[::-1]
@@ -74,54 +75,49 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=1
                     # add to new strand to DNA pool
                     new_pair.append(strand_to_add)
 
-                elif reverse_sequence in strand:
+                elif forward_compliment[1] in strand:
                     strand_to_add = forward_sequence[:]
+                    start_index = strand.find(forward_compliment[1]) + len(forward_compliment[0])
+                    end_index = start_index + falloff_rate
 
-                    for base in strand[len(forward_sequence[:]):]:
-                        if ((len(strand_to_add) - 20) <= falloff_rate):
-                            strand_to_add = strand_to_add + replaceDict[base]
+                    for base in strand[start_index:end_index]:
+                        strand_to_add = strand_to_add + replaceDict[base]
 
                     # add to new strand to DNA pool
                     new_pair.append(strand_to_add)
 
                 else:
-                    # TODO: Put in flagging mechanism
-                    print('Neither primer was found in the strand. Something went wrong')
+                    new_pair.append(strand_to_add)
 
             new_pair = tuple(new_pair)
             dna_copied.append(new_pair)
 
         replicated_dna.extend(dna_copied)
-        print(f"Cycle: {cycle}")
-
-        '''
-        print("DNA after PCR")
-        for rna in replicated_dna[1:]:
-            print(rna)
-            '''
-
 
     return replicated_dna
 
 def find_statistics(replicated_dna):
+    """
+    Find statistics on replicated DNA. Finds strands, max strand length, min strand length, and average strand length.
+    Finds average GC content of strands. Plots distributions of strands
+    :param replicated_dna:
+    :return:
+    """
 
     segment_lengths = []
     gc_contents = []
     for pair in replicated_dna:
-        segment_lengths.append(len(pair[0]))
-        segment_lengths.append(len(pair[1]))
+        for strand in pair:
+            if strand != '':
+                segment_lengths.append(len(strand))
 
-        # Find GC contents of both strands
-        num_of_c = pair[0].count('C')
-        num_of_g = pair[0].count('G')
-        gc_content = num_of_c + num_of_g
-        gc_contents.append(gc_content)
-        num_of_c = pair[1].count('C')
-        num_of_g = pair[1].count('G')
-        gc_content = num_of_c + num_of_g
-        gc_contents.append(gc_content)
+                # Find GC contents of both strands
+                num_of_c = strand.count('C')
+                num_of_g = strand.count('G')
+                gc_content = num_of_c + num_of_g
+                gc_contents.append(gc_content)
 
-    num_of_strands = len(replicated_dna) * 2
+    num_of_strands = len(segment_lengths)
 
     max_length = max(segment_lengths)
     min_length = min(segment_lengths)
@@ -132,6 +128,7 @@ def find_statistics(replicated_dna):
     plt.xlabel('Strand Lengths')
     plt.ylabel('Frequency')
     plt.title('Distribution of Strand Lengths')
+    print('Total Strands found:', num_of_strands)
     print('Average GC Content:', avg_gc_content)
     print('Max Length:', max_length)
     print('Min Length:', min_length)
@@ -158,11 +155,6 @@ if __name__ == '__main__':
     fPrimer = ("GGTTTTGTCGTGCCTGGTTT", 297, 317, .5)
     rPrimer = ("AGCAGCCAAAACACAAGCTG", 464, 443, .5)  # Sequence is reversed
 
-    # Print Sequence to replicate
-    #print(DNA[0][fPrimer[1]:rPrimer[1]])
-    #print(DNA[1][fPrimer[1]:rPrimer[1]])
-
-    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=15, fall_off_rate_base=180)
+    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=20, fall_off_rate_base=180)
     find_statistics(replicated_DNA)
     print('PCR executed in: ', time.time() - start_time)
-
