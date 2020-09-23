@@ -1,16 +1,18 @@
 import time
 import random
 import matplotlib.pyplot as plt
+import matplotlib
+import tkinter
+matplotlib.use('tkagg')
 
 
-def find_compliment(RNA):
+def find_compliment(RNA, flag):
     """
     Find the compliment to submitted RNA RNA
     :param RNA: String of RNA
     :return: Tuple of original string and complement
     """
     cDNA = RNA.upper()
-
     # Replace the nucleotides for the complementary DNA strand
     cDNA = cDNA.replace("A", "X")
     cDNA = cDNA.replace("T", "A")
@@ -20,8 +22,11 @@ def find_compliment(RNA):
     cDNA = cDNA.replace("X", "G")
 
     # Create DNA Object
-    DNA = (RNA, cDNA)
-    return DNA
+    if flag == 1:
+        return cDNA
+    else:
+        DNA = (RNA, cDNA)
+        return DNA
 
 
 def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=180):
@@ -42,8 +47,8 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=1
     replaceDict = {"A": "T", "T": "A", "G": "C", "C": "G"}
     forward_sequence = forward_primer[0]
     reverse_sequence = reverse_primer[0][::-1]
-    forward_compliment = find_compliment(forward_sequence)
-    reverse_compliment = find_compliment(reverse_sequence)
+    forward_compliment = find_compliment(forward_sequence, 0)
+    reverse_compliment = find_compliment(reverse_sequence, 0)
 
     # Make copy of DNA to store the results of the PCR
     replicated_dna = list()
@@ -51,24 +56,27 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=1
 
     # Replicate the section
     for cycle in range(1, (cycles + 1)):
+        start_time = time.time()
+        print(f"Cycle: {cycle}")
         dna_copied = []  # All of the new DNA pairs that will be found in the cycle
         for strands in replicated_dna:
             new_pair = list()  # New double strand of DNA (convert to tuple at end of iteration)
             for strand in strands:  # For loop definition does the equivalent of denaturation
                 strand_to_add = ''
-                falloff_rate = fall_off_rate_base + random.randint(-50, 50)
+                falloff_rate = fall_off_rate_base + random.randint(-50,50)
                 if reverse_compliment[1] in strand:
                     # start at the back -> front
                     # reverse strings to iterate through lists forwards for my mental health
                     strand_to_add = reverse_sequence[::-1]
                     reverse_strand = strand[::-1]
-                    start_index = reverse_strand.find(reverse_compliment[1][::-1]) + len(reverse_sequence)
+                    start_index = reverse_strand.find(
+                        reverse_compliment[1][::-1]) + len(reverse_sequence)
                     end_index = start_index + falloff_rate
 
                     # copy up to the length of the falloff_rate
-                    for base in reverse_strand[start_index:end_index]:
-                        strand_to_add = strand_to_add[:] + replaceDict[base]
-
+                    temp = find_compliment(
+                        reverse_strand[start_index:end_index], 1)
+                    strand_to_add = strand_to_add + temp
                     # reverse string again for correct 5'-3' order
                     strand_to_add = strand_to_add[::-1]
 
@@ -77,12 +85,12 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=1
 
                 elif forward_compliment[1] in strand:
                     strand_to_add = forward_sequence[:]
-                    start_index = strand.find(forward_compliment[1]) + len(forward_compliment[0])
+                    start_index = strand.find(
+                        forward_compliment[1]) + len(forward_compliment[0])
                     end_index = start_index + falloff_rate
 
-                    for base in strand[start_index:end_index]:
-                        strand_to_add = strand_to_add + replaceDict[base]
-
+                    temp = find_compliment(strand[start_index:end_index], 1)
+                    strand_to_add = strand_to_add + temp
                     # add to new strand to DNA pool
                     new_pair.append(strand_to_add)
 
@@ -93,8 +101,9 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, fall_off_rate_base=1
             dna_copied.append(new_pair)
 
         replicated_dna.extend(dna_copied)
-
+        print(f"Time To Complete: {time.time() - start_time}")
     return replicated_dna
+
 
 def find_statistics(replicated_dna):
     """
@@ -128,17 +137,18 @@ def find_statistics(replicated_dna):
     plt.xlabel('Strand Lengths')
     plt.ylabel('Frequency')
     plt.title('Distribution of Strand Lengths')
-    print('Total Strands found:', num_of_strands)
-    print('Average GC Content:', avg_gc_content)
-    print('Max Length:', max_length)
-    print('Min Length:', min_length)
-    print('Average Length:', avg_length)
+    print(f'Total Strands found:{num_of_strands}')
+    print(f'Average GC Content:{avg_gc_content}', )
+    print(f'Max Length:{max_length}')
+    print(f'Min Length:{min_length}')
+    print(f'Average Length:{avg_length}')
     plt.show()
 
     return
 
+
 if __name__ == '__main__':
-    #random.seed(99)
+    # random.seed(99)
     start_time = time.time()
 
     # Read Contents of File
@@ -148,13 +158,14 @@ if __name__ == '__main__':
     # Make the string all uppercase for ease of use
     RNA = RNA.upper()
 
-    DNA = find_compliment(RNA)
+    DNA = find_compliment(RNA, 0)
 
     # Blast primer #4
     # ("Sequence, Starting Point, Ending point, GC Content")
     fPrimer = ("GGTTTTGTCGTGCCTGGTTT", 297, 317, .5)
     rPrimer = ("AGCAGCCAAAACACAAGCTG", 464, 443, .5)  # Sequence is reversed
 
-    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer, cycles=20, fall_off_rate_base=180)
-    find_statistics(replicated_DNA)
+    replicated_DNA = run_PCR(DNA, fPrimer, rPrimer,
+                             cycles=25, fall_off_rate_base=180)
     print('PCR executed in: ', time.time() - start_time)
+    find_statistics(replicated_DNA)
