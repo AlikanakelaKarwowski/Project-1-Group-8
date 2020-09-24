@@ -131,8 +131,8 @@ def find_statistics(replicated_dna):
     max_length = max(segment_lengths)
     min_length = min(segment_lengths)
     avg_length = sum(segment_lengths) / len(segment_lengths)
-    #avg_gc_content = sum(gc_contents) / len(gc_contents)
-    avg_gc_content = sum(gc_contents)/avg_length
+    avg_gc_content = (sum(gc_contents) / len(gc_contents)) / avg_length
+    #avg_gc_content = sum(gc_contents)/avg_length
 
     hist = plt.hist(segment_lengths)
     plt.xlabel('Strand Lengths')
