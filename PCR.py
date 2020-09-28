@@ -171,6 +171,7 @@ if __name__ == '__main__':
 
     # Setup Step 3: Define Primers
     # ("Sequence, Starting Point, Ending point, GC Content")
+
     fPrimer = ("GGTTTTGTCGTGCCTGGTTT", 297, 317, .5)
     rPrimer = ("AGCAGCCAAAACACAAGCTG", 464, 443, .5)  # Sequence is reversed
 
