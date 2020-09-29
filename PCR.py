@@ -59,7 +59,7 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, falloff_base=180):
         start_time = time.time()
         print(f"Cycle: {cycle}")
         # All of the new DNA pairs that will be found in the cycle
-        dna_copied = [] 
+        dna_copied = list() 
         # Start Of Denaturation Step: Separate DNA into 2 Strands
         for dna in replicated_dna:
             # New double strand of DNA (convert to tuple at end of iteration)
@@ -143,16 +143,16 @@ def find_statistics(replicated_dna):
     avg_length = sum(segment_lengths) / len(segment_lengths)
     avg_gc_content = (sum(gc_contents) / len(gc_contents)) / avg_length
     
-    #hist = plt.hist(segment_lengths)
-    #plt.xlabel('Strand Lengths')
-    #plt.ylabel('Frequency')
-    #plt.title('Distribution of Strand Lengths')
+    hist = plt.hist(segment_lengths)
+    plt.xlabel('Strand Lengths')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Strand Lengths')
     print(f'Total Strands found: {num_of_strands}')
     print(f'Average GC Content: {"%0.2f" % (avg_gc_content*100)}%', )
     print(f'Max Length: {max_length}')
     print(f'Min Length: {min_length}')
     print(f'Average Length: {avg_length}')
-    #plt.show()
+    plt.show()
     return
 
 
