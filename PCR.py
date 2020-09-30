@@ -31,7 +31,9 @@ def find_compliment(RNA, flag):
         DNA = (RNA, cDNA)
         return DNA
 
-"""
+
+def run_PCR(dna, forward_primer, reverse_primer, cycles=10, falloff_base=180):
+    """
     This function will run a simulation of PCR using the submitted DNA segment and primers.  For each cycle, replicate
     each double stranded DNA tuple within the list.
     Within each double stranded tuple, replicate each strand. Strand replication is done by finding which primer is the
@@ -45,8 +47,6 @@ def find_compliment(RNA, flag):
     :return: list with each entry being half of a replicated DNA string. Next entry is the other half of the strand
 """
 
-def run_PCR(dna, forward_primer, reverse_primer, cycles=10, falloff_base=180):
-    
     replaceDict = {"A": "T", "T": "A", "G": "C", "C": "G"}
     forward_sequence = forward_primer[0]
     reverse_sequence = reverse_primer[0][::-1]
