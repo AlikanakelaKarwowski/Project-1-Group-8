@@ -97,7 +97,7 @@ We used driver code and 3 functions in our PCR simulation:
 -----
 
 ## main
-The driver part of our code. This section of code performs all setup needed for PCR to run properly as well as calls the [`run PCR`](#run-PCR) function
+The driver part of our code. This section of code performs all setup needed for PCR to run properly as well as calls the [`run PCR`](#run-pcr) function
 
 ```python
 if __name__ == '__main__':
@@ -291,8 +291,8 @@ def find_statistics(replicated_dna):
 Results are shown below.
 
 Note: The distribution between lengths of 160 and 170 are so small its unnoticeable in graphs.
-<img src="https://i.imgur.com/npW5hqG.png">
-<img src="https://i.imgur.com/ZopZ3Jy.png">
+<img src="https://i.imgur.com/npW5hqG.png" align="center">
+<img src="https://i.imgur.com/ZopZ3Jy.png" align="center">
 
 -----
 

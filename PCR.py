@@ -64,6 +64,7 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, falloff_base=180):
         for dna in replicated_dna:
             # New double strand of DNA (convert to tuple at end of iteration)
             new_pair = list()  
+            bad_strand = []
             # For loop definition does the equivalent of denaturation
             for strand in dna:  
                 # Calculate fall off rate
@@ -106,13 +107,14 @@ def run_PCR(dna, forward_primer, reverse_primer, cycles=10, falloff_base=180):
 
                 # If not found then the primers have fallen off so dont replicate this strand
                 else:
+                    bad_strand.append(strand)
                     new_pair.append('')
 
             new_pair = tuple(new_pair)
             dna_copied.append(new_pair)
 
         replicated_dna.extend(dna_copied)
-        print(f"Time To Complete: {time.time() - start_time}")
+        print(f"Time To Complete: {'%0.3f'%(time.time() - start_time)}")
     return replicated_dna
 
 
@@ -143,21 +145,23 @@ def find_statistics(replicated_dna):
     avg_length = sum(segment_lengths) / len(segment_lengths)
     avg_gc_content = (sum(gc_contents) / len(gc_contents)) / avg_length
     
-    hist = plt.hist(segment_lengths)
-    plt.xlabel('Strand Lengths')
-    plt.ylabel('Frequency')
-    plt.title('Distribution of Strand Lengths')
     print(f'Total Strands found: {num_of_strands}')
     print(f'Average GC Content: {"%0.2f" % (avg_gc_content*100)}%', )
     print(f'Max Length: {max_length}')
     print(f'Min Length: {min_length}')
     print(f'Average Length: {avg_length}')
+
+    hist = plt.hist(segment_lengths,bins=20)
+    plt.xlabel('Strand Lengths')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Strand Lengths')
+    
     plt.show()
     return
 
 
 if __name__ == '__main__':
-    random.seed(99)
+    #random.seed(99)
     start_time = time.time()
 
     # Setup Step 1: Read Contents of File
@@ -176,6 +180,6 @@ if __name__ == '__main__':
     rPrimer = ("AGCAGCCAAAACACAAGCTG", 464, 443, .5)  # Sequence is reversed
 
     replicated_DNA = run_PCR(DNA, fPrimer, rPrimer,
-                             cycles=20, falloff_base=180)
-    print('PCR executed in: ', time.time() - start_time)
+                             cycles=40, falloff_base=180)
+    print(f'PCR executed in: {" % 0.3f"% (time.time() - start_time)}')
     find_statistics(replicated_DNA)
